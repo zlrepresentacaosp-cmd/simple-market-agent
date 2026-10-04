@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtegidoRouteImport } from './routes/_protegido'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ProtegidoConfiguracoesRouteImport } from './routes/_protegido/configuracoes'
 import { Route as ProtegidoInicioRouteImport } from './routes/_protegido/inicio'
 import { Route as ProtegidoUsuariosRouteImport } from './routes/_protegido/usuarios'
 
@@ -29,6 +30,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtegidoConfiguracoesRoute = ProtegidoConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => ProtegidoRoute,
+} as any)
 const ProtegidoInicioRoute = ProtegidoInicioRouteImport.update({
   id: '/inicio',
   path: '/inicio',
@@ -43,12 +49,14 @@ const ProtegidoUsuariosRoute = ProtegidoUsuariosRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/configuracoes': typeof ProtegidoConfiguracoesRoute
   '/inicio': typeof ProtegidoInicioRoute
   '/usuarios': typeof ProtegidoUsuariosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/configuracoes': typeof ProtegidoConfiguracoesRoute
   '/inicio': typeof ProtegidoInicioRoute
   '/usuarios': typeof ProtegidoUsuariosRoute
 }
@@ -57,19 +65,21 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_protegido': typeof ProtegidoRouteWithChildren
   '/login': typeof LoginRoute
+  '/_protegido/configuracoes': typeof ProtegidoConfiguracoesRoute
   '/_protegido/inicio': typeof ProtegidoInicioRoute
   '/_protegido/usuarios': typeof ProtegidoUsuariosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/inicio' | '/usuarios'
+  fullPaths: '/' | '/login' | '/configuracoes' | '/inicio' | '/usuarios'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/inicio' | '/usuarios'
+  to: '/' | '/login' | '/configuracoes' | '/inicio' | '/usuarios'
   id:
     | '__root__'
     | '/'
     | '/_protegido'
     | '/login'
+    | '/_protegido/configuracoes'
     | '/_protegido/inicio'
     | '/_protegido/usuarios'
   fileRoutesById: FileRoutesById
@@ -103,6 +113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protegido/configuracoes': {
+      id: '/_protegido/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof ProtegidoConfiguracoesRouteImport
+      parentRoute: typeof ProtegidoRoute
+    }
     '/_protegido/inicio': {
       id: '/_protegido/inicio'
       path: '/inicio'
@@ -121,11 +138,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface ProtegidoRouteChildren {
+  ProtegidoConfiguracoesRoute: typeof ProtegidoConfiguracoesRoute
   ProtegidoInicioRoute: typeof ProtegidoInicioRoute
   ProtegidoUsuariosRoute: typeof ProtegidoUsuariosRoute
 }
 
 const ProtegidoRouteChildren: ProtegidoRouteChildren = {
+  ProtegidoConfiguracoesRoute: ProtegidoConfiguracoesRoute,
   ProtegidoInicioRoute: ProtegidoInicioRoute,
   ProtegidoUsuariosRoute: ProtegidoUsuariosRoute,
 }
