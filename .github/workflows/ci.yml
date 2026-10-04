@@ -2,35 +2,42 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "infra-ci-package-manager"]
   pull_request:
     branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Branch to validate"
+        required: true
+        default: "infra-ci-package-manager"
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ inputs.target_branch }}
   cancel-in-progress: true
 
 jobs:
   quality:
-    name: Node 20 • lint • typecheck • test • build
+    name: Quality checks
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout selected branch
         uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.target_branch || github.ref }}
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "20.x"
+          node-version: ${{ (inputs.target_branch || github.ref_name) == 'infra-ci-package-manager' && '22.x' || '20.x' }}
 
-      # The repository currently has bun.lock but no package-lock.json,
-      # so npm ci cannot be used until an npm lockfile is intentionally adopted.
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Apply SQLite migrations
         run: npm run db:migrate
