@@ -1,0 +1,58 @@
+name: Format
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Branch to format and update"
+        required: true
+        default: "infra-ci-package-manager"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    name: Format selected branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reject main as target
+        if: inputs.target_branch == 'main'
+        run: |
+          echo "Refusing to format main. Choose a development branch."
+          exit 1
+
+      - name: Checkout selected branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.target_branch }}
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22.x"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prettier
+        run: npm exec prettier -- --write .
+
+      - name: ESLint autofix
+        run: npm run lint -- --fix
+
+      - name: Commit changed files only
+        run: |
+          if git diff --quiet; then
+            echo "No formatting changes were necessary."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "style: format project"
+          git push origin HEAD:${{ inputs.target_branch }}
