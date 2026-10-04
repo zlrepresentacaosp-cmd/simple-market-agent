@@ -26,7 +26,6 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: "20.x"
-          cache: npm
 
       # The repository currently has bun.lock but no package-lock.json,
       # so npm ci cannot be used until an npm lockfile is intentionally adopted.
