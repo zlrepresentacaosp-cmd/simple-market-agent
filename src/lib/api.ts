@@ -18,10 +18,12 @@ export async function api<T>(caminho: string, init?: RequestInit & { json?: unkn
   const { json, ...rest } = init ?? {};
   let res: Response;
   try {
+    const headers = new Headers(rest.headers);
+    if (json !== undefined) headers.set("content-type", "application/json");
     res = await fetch(caminho, {
-      credentials: "same-origin",
       ...rest,
-      headers: json !== undefined ? { "content-type": "application/json" } : (rest.headers ?? {}),
+      credentials: "same-origin",
+      headers,
       body: json !== undefined ? JSON.stringify(json) : (rest.body ?? null),
     });
   } catch {
