@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Node 20 • lint • typecheck • test • build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v7
+        with:
+          node-version: "20.x"
+          cache: npm
+
+      # The repository currently has bun.lock but no package-lock.json,
+      # so npm ci cannot be used until an npm lockfile is intentionally adopted.
+      - name: Install dependencies
+        run: npm install
+
+      - name: Apply SQLite migrations
+        run: npm run db:migrate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
