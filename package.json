@@ -1,5 +1,5 @@
 {
-  "name": "tanstack_start_ts",
+  "name": "compras-inteligentes",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -11,7 +11,11 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "dev:server": "tsx watch server/index.ts",
+    "start:server": "tsx server/index.ts",
+    "db:migrate": "tsx server/scripts/migrate.ts",
+    "user:create": "tsx server/scripts/create-user.ts"
   },
   "overrides": {
     "rolldown": "1.2.1"
@@ -94,5 +98,11 @@
     "typescript-eslint": "^8.56.1",
     "vite": "8.1.5",
     "vitest": "^4.1.10"
-  }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "trustedDependencies": [
+    "better-sqlite3"
+  ]
 }

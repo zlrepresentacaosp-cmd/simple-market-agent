@@ -12,4 +12,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    server: {
+      // Encaminha /api para o servidor Fastify local (npm run dev:server).
+      proxy: { "/api": { target: process.env["API_URL"] ?? "http://127.0.0.1:3333", changeOrigin: false } },
+    },
+  },
 });
