@@ -32,7 +32,8 @@ function Layout() {
     navigate({ to: "/login", replace: true });
   }
 
-  const link = "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground";
+  const link =
+    "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground";
   const ativo = { className: "bg-accent text-foreground" };
 
   return (
@@ -41,17 +42,25 @@ function Layout() {
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
           <span className="font-semibold">Compras Inteligentes</span>
           <nav className="flex gap-1">
-            <Link to="/inicio" className={link} activeProps={ativo}>Início</Link>
-            <Link to="/configuracoes" className={link} activeProps={ativo}>Configurações</Link>
+            <Link to="/inicio" className={link} activeProps={ativo}>
+              Início
+            </Link>
+            <Link to="/configuracoes" className={link} activeProps={ativo}>
+              Configurações
+            </Link>
             {pode(usuario.papel, "usuarios.gerenciar") && (
-              <Link to="/usuarios" className={link} activeProps={ativo}>Usuários</Link>
+              <Link to="/usuarios" className={link} activeProps={ativo}>
+                Usuários
+              </Link>
             )}
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm">
             <span className="text-muted-foreground">
               {usuario.nome} · {rotuloPapel(usuario.papel)}
             </span>
-            <Button variant="outline" size="sm" onClick={sair}>Sair</Button>
+            <Button variant="outline" size="sm" onClick={sair}>
+              Sair
+            </Button>
           </div>
         </div>
       </header>

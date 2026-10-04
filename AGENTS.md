@@ -1,4 +1,5 @@
 <!-- LOVABLE:BEGIN -->
+
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
 > published git history — force pushing, or rebasing/amending/squashing commits
@@ -7,9 +8,11 @@
 >
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
+
 <!-- LOVABLE:END -->
 
 ## Architecture rules
+
 - Pure business rules live in `src/engine/` (no I/O); shared by server and web so validation/permissions have one source.
 - Backend is a local Node + Fastify API in `server/` with SQLite (better-sqlite3) — the spec requires a local single-file DB.
 - Schema changes are append-only entries in `server/db/migrations.ts`; never edit an applied migration.

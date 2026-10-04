@@ -1,14 +1,7 @@
 // Regras puras de parâmetros de negócio (sem I/O). Compartilhado por server e web.
 
 export type ParamType =
-  | "moeda"
-  | "percentual"
-  | "inteiro"
-  | "decimal"
-  | "horario"
-  | "texto"
-  | "email"
-  | "lista";
+  "moeda" | "percentual" | "inteiro" | "decimal" | "horario" | "texto" | "email" | "lista";
 
 export interface ListField {
   chave: string;
@@ -55,44 +48,254 @@ export const GRUPOS: { chave: GrupoChave; rotulo: string }[] = [
 
 export const PARAMETROS: ParamDef[] = [
   // Financeiro
-  { chave: "faturamento_medio_mensal", grupo: "financeiro", rotulo: "Faturamento médio mensal", tipo: "moeda", padrao: 260000, min: 0 },
-  { chave: "margem_bruta_alvo", grupo: "financeiro", rotulo: "Margem bruta alvo", tipo: "percentual", padrao: 35, min: 0, max: 100 },
-  { chave: "orcamento_compras_mensal", grupo: "financeiro", rotulo: "Orçamento mensal de compras (CMV alvo)", tipo: "moeda", padrao: 169000, min: 0 },
-  { chave: "salarios_referencia", grupo: "financeiro", rotulo: "Salários (referência)", tipo: "moeda", padrao: 8900, min: 0 },
+  {
+    chave: "faturamento_medio_mensal",
+    grupo: "financeiro",
+    rotulo: "Faturamento médio mensal",
+    tipo: "moeda",
+    padrao: 260000,
+    min: 0,
+  },
+  {
+    chave: "margem_bruta_alvo",
+    grupo: "financeiro",
+    rotulo: "Margem bruta alvo",
+    tipo: "percentual",
+    padrao: 35,
+    min: 0,
+    max: 100,
+  },
+  {
+    chave: "orcamento_compras_mensal",
+    grupo: "financeiro",
+    rotulo: "Orçamento mensal de compras (CMV alvo)",
+    tipo: "moeda",
+    padrao: 169000,
+    min: 0,
+  },
+  {
+    chave: "salarios_referencia",
+    grupo: "financeiro",
+    rotulo: "Salários (referência)",
+    tipo: "moeda",
+    padrao: 8900,
+    min: 0,
+  },
 
   // Custos fixos [PREENCHER]
-  { chave: "aluguel", grupo: "custos_fixos", rotulo: "Aluguel", tipo: "moeda", padrao: null, preencher: true, min: 0 },
-  { chave: "energia", grupo: "custos_fixos", rotulo: "Energia", tipo: "moeda", padrao: null, preencher: true, min: 0 },
-  { chave: "pro_labore", grupo: "custos_fixos", rotulo: "Pró-labore", tipo: "moeda", padrao: null, preencher: true, min: 0 },
-  { chave: "outros_custos_fixos", grupo: "custos_fixos", rotulo: "Outros custos fixos", tipo: "moeda", padrao: null, preencher: true, min: 0 },
-  { chave: "encargos_percentual", grupo: "custos_fixos", rotulo: "Encargos sobre salários", tipo: "percentual", padrao: null, preencher: true, min: 0, max: 100 },
+  {
+    chave: "aluguel",
+    grupo: "custos_fixos",
+    rotulo: "Aluguel",
+    tipo: "moeda",
+    padrao: null,
+    preencher: true,
+    min: 0,
+  },
+  {
+    chave: "energia",
+    grupo: "custos_fixos",
+    rotulo: "Energia",
+    tipo: "moeda",
+    padrao: null,
+    preencher: true,
+    min: 0,
+  },
+  {
+    chave: "pro_labore",
+    grupo: "custos_fixos",
+    rotulo: "Pró-labore",
+    tipo: "moeda",
+    padrao: null,
+    preencher: true,
+    min: 0,
+  },
+  {
+    chave: "outros_custos_fixos",
+    grupo: "custos_fixos",
+    rotulo: "Outros custos fixos",
+    tipo: "moeda",
+    padrao: null,
+    preencher: true,
+    min: 0,
+  },
+  {
+    chave: "encargos_percentual",
+    grupo: "custos_fixos",
+    rotulo: "Encargos sobre salários",
+    tipo: "percentual",
+    padrao: null,
+    preencher: true,
+    min: 0,
+    max: 100,
+  },
 
   // Tributário [PREENCHER]
-  { chave: "regime_tributario", grupo: "tributario", rotulo: "Regime tributário", tipo: "texto", padrao: null, preencher: true },
-  { chave: "aliquota_tributaria", grupo: "tributario", rotulo: "Alíquota tributária", tipo: "percentual", padrao: null, preencher: true, min: 0, max: 100 },
+  {
+    chave: "regime_tributario",
+    grupo: "tributario",
+    rotulo: "Regime tributário",
+    tipo: "texto",
+    padrao: null,
+    preencher: true,
+  },
+  {
+    chave: "aliquota_tributaria",
+    grupo: "tributario",
+    rotulo: "Alíquota tributária",
+    tipo: "percentual",
+    padrao: null,
+    preencher: true,
+    min: 0,
+    max: 100,
+  },
 
   // Cobertura ABC
-  { chave: "cobertura_dias_a", grupo: "cobertura", rotulo: "Cobertura — curva A", tipo: "inteiro", unidade: "dias", padrao: 7, min: 0 },
-  { chave: "cobertura_dias_b", grupo: "cobertura", rotulo: "Cobertura — curva B", tipo: "inteiro", unidade: "dias", padrao: 14, min: 0 },
-  { chave: "cobertura_dias_c", grupo: "cobertura", rotulo: "Cobertura — curva C", tipo: "inteiro", unidade: "dias", padrao: 21, min: 0 },
-  { chave: "seguranca_dias_a", grupo: "cobertura", rotulo: "Segurança — curva A", tipo: "inteiro", unidade: "dias", padrao: 2, min: 0 },
-  { chave: "seguranca_dias_b", grupo: "cobertura", rotulo: "Segurança — curva B", tipo: "inteiro", unidade: "dias", padrao: 2, min: 0 },
-  { chave: "seguranca_dias_c", grupo: "cobertura", rotulo: "Segurança — curva C", tipo: "inteiro", unidade: "dias", padrao: 0, min: 0 },
+  {
+    chave: "cobertura_dias_a",
+    grupo: "cobertura",
+    rotulo: "Cobertura — curva A",
+    tipo: "inteiro",
+    unidade: "dias",
+    padrao: 7,
+    min: 0,
+  },
+  {
+    chave: "cobertura_dias_b",
+    grupo: "cobertura",
+    rotulo: "Cobertura — curva B",
+    tipo: "inteiro",
+    unidade: "dias",
+    padrao: 14,
+    min: 0,
+  },
+  {
+    chave: "cobertura_dias_c",
+    grupo: "cobertura",
+    rotulo: "Cobertura — curva C",
+    tipo: "inteiro",
+    unidade: "dias",
+    padrao: 21,
+    min: 0,
+  },
+  {
+    chave: "seguranca_dias_a",
+    grupo: "cobertura",
+    rotulo: "Segurança — curva A",
+    tipo: "inteiro",
+    unidade: "dias",
+    padrao: 2,
+    min: 0,
+  },
+  {
+    chave: "seguranca_dias_b",
+    grupo: "cobertura",
+    rotulo: "Segurança — curva B",
+    tipo: "inteiro",
+    unidade: "dias",
+    padrao: 2,
+    min: 0,
+  },
+  {
+    chave: "seguranca_dias_c",
+    grupo: "cobertura",
+    rotulo: "Segurança — curva C",
+    tipo: "inteiro",
+    unidade: "dias",
+    padrao: 0,
+    min: 0,
+  },
 
   // Perecíveis
-  { chave: "teto_hortifruti_dias", grupo: "pereciveis", rotulo: "Teto — hortifrúti", tipo: "inteiro", unidade: "dias", padrao: 3, min: 0 },
-  { chave: "teto_acougue_dias", grupo: "pereciveis", rotulo: "Teto — açougue", tipo: "inteiro", unidade: "dias", padrao: 3, min: 0 },
-  { chave: "teto_padaria_matinais_dias", grupo: "pereciveis", rotulo: "Teto — padaria/matinais", tipo: "inteiro", unidade: "dias", padrao: 2, min: 0 },
-  { chave: "teto_frios_congelados_dias", grupo: "pereciveis", rotulo: "Teto — frios/congelados", tipo: "inteiro", unidade: "dias", padrao: 7, min: 0 },
-  { chave: "giro_minimo", grupo: "pereciveis", rotulo: "Giro mínimo", tipo: "decimal", padrao: 3, min: 0 },
+  {
+    chave: "teto_hortifruti_dias",
+    grupo: "pereciveis",
+    rotulo: "Teto — hortifrúti",
+    tipo: "inteiro",
+    unidade: "dias",
+    padrao: 3,
+    min: 0,
+  },
+  {
+    chave: "teto_acougue_dias",
+    grupo: "pereciveis",
+    rotulo: "Teto — açougue",
+    tipo: "inteiro",
+    unidade: "dias",
+    padrao: 3,
+    min: 0,
+  },
+  {
+    chave: "teto_padaria_matinais_dias",
+    grupo: "pereciveis",
+    rotulo: "Teto — padaria/matinais",
+    tipo: "inteiro",
+    unidade: "dias",
+    padrao: 2,
+    min: 0,
+  },
+  {
+    chave: "teto_frios_congelados_dias",
+    grupo: "pereciveis",
+    rotulo: "Teto — frios/congelados",
+    tipo: "inteiro",
+    unidade: "dias",
+    padrao: 7,
+    min: 0,
+  },
+  {
+    chave: "giro_minimo",
+    grupo: "pereciveis",
+    rotulo: "Giro mínimo",
+    tipo: "decimal",
+    padrao: 3,
+    min: 0,
+  },
 
   // Concorrentes
-  { chave: "limite_concorrente_mais_caro_atencao", grupo: "concorrentes", rotulo: "Nosso preço mais caro — atenção", tipo: "percentual", padrao: 10, min: 0, max: 100 },
-  { chave: "limite_concorrente_mais_caro_critico", grupo: "concorrentes", rotulo: "Nosso preço mais caro — crítico", tipo: "percentual", padrao: 15, min: 0, max: 100 },
-  { chave: "limite_concorrente_mais_barato_atencao", grupo: "concorrentes", rotulo: "Nosso preço mais barato — atenção", tipo: "percentual", padrao: 10, min: 0, max: 100 },
-  { chave: "limite_concorrente_mais_barato_critico", grupo: "concorrentes", rotulo: "Nosso preço mais barato — crítico", tipo: "percentual", padrao: 15, min: 0, max: 100 },
   {
-    chave: "concorrentes", grupo: "concorrentes", rotulo: "Concorrentes e URLs", tipo: "lista", padrao: null, preencher: true,
+    chave: "limite_concorrente_mais_caro_atencao",
+    grupo: "concorrentes",
+    rotulo: "Nosso preço mais caro — atenção",
+    tipo: "percentual",
+    padrao: 10,
+    min: 0,
+    max: 100,
+  },
+  {
+    chave: "limite_concorrente_mais_caro_critico",
+    grupo: "concorrentes",
+    rotulo: "Nosso preço mais caro — crítico",
+    tipo: "percentual",
+    padrao: 15,
+    min: 0,
+    max: 100,
+  },
+  {
+    chave: "limite_concorrente_mais_barato_atencao",
+    grupo: "concorrentes",
+    rotulo: "Nosso preço mais barato — atenção",
+    tipo: "percentual",
+    padrao: 10,
+    min: 0,
+    max: 100,
+  },
+  {
+    chave: "limite_concorrente_mais_barato_critico",
+    grupo: "concorrentes",
+    rotulo: "Nosso preço mais barato — crítico",
+    tipo: "percentual",
+    padrao: 15,
+    min: 0,
+    max: 100,
+  },
+  {
+    chave: "concorrentes",
+    grupo: "concorrentes",
+    rotulo: "Concorrentes e URLs",
+    tipo: "lista",
+    padrao: null,
+    preencher: true,
     campos: [
       { chave: "nome", rotulo: "Nome", tipo: "texto" },
       { chave: "url", rotulo: "URL", tipo: "url" },
@@ -101,7 +304,12 @@ export const PARAMETROS: ParamDef[] = [
 
   // Fornecedores [PREENCHER]
   {
-    chave: "fornecedores_prazos", grupo: "fornecedores", rotulo: "Prazos e dias de pedido dos fornecedores", tipo: "lista", padrao: null, preencher: true,
+    chave: "fornecedores_prazos",
+    grupo: "fornecedores",
+    rotulo: "Prazos e dias de pedido dos fornecedores",
+    tipo: "lista",
+    padrao: null,
+    preencher: true,
     campos: [
       { chave: "fornecedor", rotulo: "Fornecedor", tipo: "texto" },
       { chave: "prazo_entrega_dias", rotulo: "Prazo de entrega (dias)", tipo: "inteiro" },
@@ -110,9 +318,28 @@ export const PARAMETROS: ParamDef[] = [
   },
 
   // Automação
-  { chave: "horario_automacao", grupo: "automacao", rotulo: "Horário da automação diária", tipo: "horario", padrao: "08:00" },
-  { chave: "fuso_horario", grupo: "automacao", rotulo: "Fuso horário", tipo: "texto", padrao: "America/Sao_Paulo" },
-  { chave: "email_notificacoes", grupo: "automacao", rotulo: "E-mail de notificações", tipo: "email", padrao: null, preencher: true },
+  {
+    chave: "horario_automacao",
+    grupo: "automacao",
+    rotulo: "Horário da automação diária",
+    tipo: "horario",
+    padrao: "08:00",
+  },
+  {
+    chave: "fuso_horario",
+    grupo: "automacao",
+    rotulo: "Fuso horário",
+    tipo: "texto",
+    padrao: "America/Sao_Paulo",
+  },
+  {
+    chave: "email_notificacoes",
+    grupo: "automacao",
+    rotulo: "E-mail de notificações",
+    tipo: "email",
+    padrao: null,
+    preencher: true,
+  },
 ];
 
 const POR_CHAVE = new Map(PARAMETROS.map((p) => [p.chave, p]));
@@ -139,7 +366,10 @@ function toNumber(v: unknown): number {
 }
 
 export function validarParametro(def: ParamDef, raw: unknown): ValidationResult {
-  const vazio = raw === null || raw === undefined || (typeof raw === "string" && raw.trim() === "") ||
+  const vazio =
+    raw === null ||
+    raw === undefined ||
+    (typeof raw === "string" && raw.trim() === "") ||
     (Array.isArray(raw) && raw.length === 0);
   if (vazio) {
     if (def.preencher) return { ok: true, value: null };
@@ -153,19 +383,24 @@ export function validarParametro(def: ParamDef, raw: unknown): ValidationResult 
     case "inteiro": {
       const n = toNumber(raw);
       if (!Number.isFinite(n)) return { ok: false, error: `${def.rotulo}: número inválido.` };
-      if (def.tipo === "inteiro" && !Number.isInteger(n)) return { ok: false, error: `${def.rotulo}: deve ser inteiro.` };
-      if (def.min !== undefined && n < def.min) return { ok: false, error: `${def.rotulo}: mínimo ${def.min}.` };
-      if (def.max !== undefined && n > def.max) return { ok: false, error: `${def.rotulo}: máximo ${def.max}.` };
+      if (def.tipo === "inteiro" && !Number.isInteger(n))
+        return { ok: false, error: `${def.rotulo}: deve ser inteiro.` };
+      if (def.min !== undefined && n < def.min)
+        return { ok: false, error: `${def.rotulo}: mínimo ${def.min}.` };
+      if (def.max !== undefined && n > def.max)
+        return { ok: false, error: `${def.rotulo}: máximo ${def.max}.` };
       return { ok: true, value: def.tipo === "moeda" ? Math.round(n * 100) / 100 : n };
     }
     case "horario": {
       const s = String(raw).trim();
-      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(s)) return { ok: false, error: `${def.rotulo}: use HH:MM.` };
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(s))
+        return { ok: false, error: `${def.rotulo}: use HH:MM.` };
       return { ok: true, value: s };
     }
     case "email": {
       const s = String(raw).trim();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return { ok: false, error: `${def.rotulo}: e-mail inválido.` };
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s))
+        return { ok: false, error: `${def.rotulo}: e-mail inválido.` };
       return { ok: true, value: s };
     }
     case "texto": {
@@ -177,20 +412,29 @@ export function validarParametro(def: ParamDef, raw: unknown): ValidationResult 
       const campos = def.campos ?? [];
       const linhas: Record<string, unknown>[] = [];
       for (const [i, item] of raw.entries()) {
-        if (typeof item !== "object" || item === null) return { ok: false, error: `${def.rotulo}: linha ${i + 1} inválida.` };
+        if (typeof item !== "object" || item === null)
+          return { ok: false, error: `${def.rotulo}: linha ${i + 1} inválida.` };
         const linha: Record<string, unknown> = {};
         for (const c of campos) {
           const v = (item as Record<string, unknown>)[c.chave];
           if (v === undefined || v === null || String(v).trim() === "") {
-            return { ok: false, error: `${def.rotulo}: linha ${i + 1}, "${c.rotulo}" obrigatório.` };
+            return {
+              ok: false,
+              error: `${def.rotulo}: linha ${i + 1}, "${c.rotulo}" obrigatório.`,
+            };
           }
           if (c.tipo === "inteiro") {
             const n = toNumber(v);
-            if (!Number.isInteger(n) || n < 0) return { ok: false, error: `${def.rotulo}: linha ${i + 1}, "${c.rotulo}" deve ser inteiro ≥ 0.` };
+            if (!Number.isInteger(n) || n < 0)
+              return {
+                ok: false,
+                error: `${def.rotulo}: linha ${i + 1}, "${c.rotulo}" deve ser inteiro ≥ 0.`,
+              };
             linha[c.chave] = n;
           } else if (c.tipo === "url") {
             const s = String(v).trim();
-            if (!/^https?:\/\/\S+$/.test(s)) return { ok: false, error: `${def.rotulo}: linha ${i + 1}, URL inválida.` };
+            if (!/^https?:\/\/\S+$/.test(s))
+              return { ok: false, error: `${def.rotulo}: linha ${i + 1}, URL inválida.` };
             linha[c.chave] = s;
           } else {
             linha[c.chave] = String(v).trim();

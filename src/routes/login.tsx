@@ -33,7 +33,10 @@ function Login() {
     setErro(null);
     setEnviando(true);
     try {
-      await api<{ usuario: UsuarioAPI }>("/api/auth/login", { method: "POST", json: { usuario, senha } });
+      await api<{ usuario: UsuarioAPI }>("/api/auth/login", {
+        method: "POST",
+        json: { usuario, senha },
+      });
       navigate({ to: "/inicio", replace: true });
     } catch (err) {
       setErro((err as Error).message);
@@ -53,13 +56,30 @@ function Login() {
           <form onSubmit={enviar} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="usuario">Usuário</Label>
-              <Input id="usuario" autoComplete="username" value={usuario} onChange={(e) => setUsuario(e.target.value)} required />
+              <Input
+                id="usuario"
+                autoComplete="username"
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="senha">Senha</Label>
-              <Input id="senha" type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} required />
+              <Input
+                id="senha"
+                type="password"
+                autoComplete="current-password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                required
+              />
             </div>
-            {erro && <p className="text-sm text-destructive" role="alert">{erro}</p>}
+            {erro && (
+              <p className="text-sm text-destructive" role="alert">
+                {erro}
+              </p>
+            )}
             <Button type="submit" className="w-full" disabled={enviando}>
               {enviando ? "Entrando..." : "Entrar"}
             </Button>

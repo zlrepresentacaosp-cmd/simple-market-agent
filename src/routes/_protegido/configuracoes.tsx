@@ -6,11 +6,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { api } from "@/lib/api";
 import { GRUPOS, PARAMETROS, getParamDef, type ParamDef } from "@/engine/parameters";
 import { pode } from "@/engine/permissions";
-import { formatarDataHora, formatarMoeda, formatarNumero, formatarPercentual } from "@/engine/format";
+import {
+  formatarDataHora,
+  formatarMoeda,
+  formatarNumero,
+  formatarPercentual,
+} from "@/engine/format";
 
 export const Route = createFileRoute("/_protegido/configuracoes")({
   head: () => ({
@@ -26,15 +38,33 @@ export const Route = createFileRoute("/_protegido/configuracoes")({
   component: Configuracoes,
 });
 
-interface Config { chave: string; valor: unknown; updated_at: string; updated_by: string | null }
-interface Hist { id: number; chave: string; rotulo: string; valor_anterior: unknown; valor_novo: unknown; usuario: string | null; origem: string; changed_at: string }
+interface Config {
+  chave: string;
+  valor: unknown;
+  updated_at: string;
+  updated_by: string | null;
+}
+interface Hist {
+  id: number;
+  chave: string;
+  rotulo: string;
+  valor_anterior: unknown;
+  valor_novo: unknown;
+  usuario: string | null;
+  origem: string;
+  changed_at: string;
+}
 
 type Linha = Record<string, string>;
 type Rascunho = Record<string, string | Linha[]>;
 
 function paraRascunho(def: ParamDef, v: unknown): string | Linha[] {
   if (def.tipo === "lista") {
-    return Array.isArray(v) ? v.map((l) => Object.fromEntries(Object.entries(l as object).map(([k, x]) => [k, String(x)]))) : [];
+    return Array.isArray(v)
+      ? v.map((l) =>
+          Object.fromEntries(Object.entries(l as object).map(([k, x]) => [k, String(x)])),
+        )
+      : [];
   }
   if (v === null || v === undefined) return "";
   if (typeof v === "number") return String(v).replace(".", ",");
@@ -58,8 +88,14 @@ function Configuracoes() {
   const { usuario } = Route.useRouteContext();
   const podeEditar = pode(usuario.papel, "configuracoes.editar");
   const qc = useQueryClient();
-  const cfg = useQuery({ queryKey: ["configuracoes"], queryFn: () => api<{ configuracoes: Config[] }>("/api/configuracoes") });
-  const hist = useQuery({ queryKey: ["historico"], queryFn: () => api<{ historico: Hist[] }>("/api/configuracoes/historico") });
+  const cfg = useQuery({
+    queryKey: ["configuracoes"],
+    queryFn: () => api<{ configuracoes: Config[] }>("/api/configuracoes"),
+  });
+  const hist = useQuery({
+    queryKey: ["historico"],
+    queryFn: () => api<{ historico: Hist[] }>("/api/configuracoes/historico"),
+  });
 
   const original = useMemo<Rascunho>(() => {
     const r: Rascunho = {};
@@ -72,11 +108,18 @@ function Configuracoes() {
   const [rascunho, setRascunho] = useState<Rascunho>({});
   useEffect(() => setRascunho(original), [original]);
 
-  const alteradas = Object.keys(rascunho).filter((k) => JSON.stringify(rascunho[k]) !== JSON.stringify(original[k]));
+  const alteradas = Object.keys(rascunho).filter(
+    (k) => JSON.stringify(rascunho[k]) !== JSON.stringify(original[k]),
+  );
   const [msg, setMsg] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
 
   const aposSalvar = (r: { alteradas: string[] }) => {
-    setMsg({ tipo: "ok", texto: r.alteradas.length ? `${r.alteradas.length} parâmetro(s) atualizado(s).` : "Nenhuma alteração." });
+    setMsg({
+      tipo: "ok",
+      texto: r.alteradas.length
+        ? `${r.alteradas.length} parâmetro(s) atualizado(s).`
+        : "Nenhuma alteração.",
+    });
     qc.invalidateQueries({ queryKey: ["configuracoes"] });
     qc.invalidateQueries({ queryKey: ["historico"] });
   };
@@ -86,16 +129,18 @@ function Configuracoes() {
   };
 
   const salvar = useMutation({
-    mutationFn: () => api<{ alteradas: string[] }>("/api/configuracoes", {
-      method: "PUT",
-      json: { alteracoes: Object.fromEntries(alteradas.map((k) => [k, rascunho[k]])) },
-    }),
+    mutationFn: () =>
+      api<{ alteradas: string[] }>("/api/configuracoes", {
+        method: "PUT",
+        json: { alteracoes: Object.fromEntries(alteradas.map((k) => [k, rascunho[k]])) },
+      }),
     onSuccess: aposSalvar,
     onError: erro,
   });
 
   const importar = useMutation({
-    mutationFn: (json: unknown) => api<{ alteradas: string[] }>("/api/configuracoes/importar", { method: "POST", json }),
+    mutationFn: (json: unknown) =>
+      api<{ alteradas: string[] }>("/api/configuracoes/importar", { method: "POST", json }),
     onSuccess: aposSalvar,
     onError: erro,
   });
@@ -122,21 +167,46 @@ function Configuracoes() {
         <h1 className="text-2xl font-semibold">Configurações</h1>
         {!podeEditar && <Badge variant="secondary">Somente leitura</Badge>}
         <div className="ml-auto flex gap-2">
-          <Button variant="outline" asChild><a href="/api/configuracoes/exportar" download="configuracoes.json">Exportar JSON</a></Button>
+          <Button variant="outline" asChild>
+            <a href="/api/configuracoes/exportar" download="configuracoes.json">
+              Exportar JSON
+            </a>
+          </Button>
           {podeEditar && (
             <>
-              <input ref={arquivo} type="file" accept="application/json,.json" className="hidden" onChange={(e) => aoEscolherArquivo(e.target.files?.[0])} />
-              <Button variant="outline" onClick={() => arquivo.current?.click()} disabled={importar.isPending}>Importar JSON</Button>
+              <input
+                ref={arquivo}
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={(e) => aoEscolherArquivo(e.target.files?.[0])}
+              />
+              <Button
+                variant="outline"
+                onClick={() => arquivo.current?.click()}
+                disabled={importar.isPending}
+              >
+                Importar JSON
+              </Button>
             </>
           )}
         </div>
       </div>
 
-      {msg && <p className={msg.tipo === "ok" ? "text-sm text-primary" : "text-sm text-destructive"} role="status">{msg.texto}</p>}
+      {msg && (
+        <p
+          className={msg.tipo === "ok" ? "text-sm text-primary" : "text-sm text-destructive"}
+          role="status"
+        >
+          {msg.texto}
+        </p>
+      )}
 
       {GRUPOS.map((g) => (
         <Card key={g.chave}>
-          <CardHeader><CardTitle className="text-base">{g.rotulo}</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-base">{g.rotulo}</CardTitle>
+          </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             {PARAMETROS.filter((p) => p.grupo === g.chave).map((def) => (
               <Campo
@@ -145,7 +215,11 @@ function Configuracoes() {
                 valor={rascunho[def.chave] ?? (def.tipo === "lista" ? [] : "")}
                 alterado={alteradas.includes(def.chave)}
                 desabilitado={!podeEditar}
-                atualizadoEm={meta.get(def.chave)?.updated_by ? `${meta.get(def.chave)!.updated_by}, ${formatarDataHora(meta.get(def.chave)!.updated_at)}` : null}
+                atualizadoEm={
+                  meta.get(def.chave)?.updated_by
+                    ? `${meta.get(def.chave)!.updated_by}, ${formatarDataHora(meta.get(def.chave)!.updated_at)}`
+                    : null
+                }
                 onChange={(v) => setRascunho((r) => ({ ...r, [def.chave]: v }))}
               />
             ))}
@@ -155,7 +229,16 @@ function Configuracoes() {
 
       {podeEditar && (
         <div className="sticky bottom-4 flex justify-end gap-2">
-          <Button variant="outline" disabled={!alteradas.length} onClick={() => { setRascunho(original); setMsg(null); }}>Descartar</Button>
+          <Button
+            variant="outline"
+            disabled={!alteradas.length}
+            onClick={() => {
+              setRascunho(original);
+              setMsg(null);
+            }}
+          >
+            Descartar
+          </Button>
           <Button disabled={!alteradas.length || salvar.isPending} onClick={() => salvar.mutate()}>
             Salvar {alteradas.length ? `(${alteradas.length})` : ""}
           </Button>
@@ -163,18 +246,28 @@ function Configuracoes() {
       )}
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Histórico de alterações</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-base">Histórico de alterações</CardTitle>
+        </CardHeader>
         <CardContent>
           {hist.data?.historico.length ? (
             <Table>
-              <TableHeader><TableRow>
-                <TableHead>Data</TableHead><TableHead>Usuário</TableHead><TableHead>Parâmetro</TableHead>
-                <TableHead>Antes</TableHead><TableHead>Depois</TableHead><TableHead>Origem</TableHead>
-              </TableRow></TableHeader>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Usuário</TableHead>
+                  <TableHead>Parâmetro</TableHead>
+                  <TableHead>Antes</TableHead>
+                  <TableHead>Depois</TableHead>
+                  <TableHead>Origem</TableHead>
+                </TableRow>
+              </TableHeader>
               <TableBody>
                 {hist.data.historico.map((h) => (
                   <TableRow key={h.id}>
-                    <TableCell className="whitespace-nowrap">{formatarDataHora(h.changed_at)}</TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {formatarDataHora(h.changed_at)}
+                    </TableCell>
                     <TableCell>{h.usuario ?? "—"}</TableCell>
                     <TableCell>{h.rotulo}</TableCell>
                     <TableCell>{exibir(h.chave, h.valor_anterior)}</TableCell>
@@ -210,7 +303,9 @@ function Campo(props: {
       {props.alterado && <Badge>alterado</Badge>}
     </div>
   );
-  const rodape = props.atualizadoEm && <p className="text-xs text-muted-foreground">Última alteração: {props.atualizadoEm}</p>;
+  const rodape = props.atualizadoEm && (
+    <p className="text-xs text-muted-foreground">Última alteração: {props.atualizadoEm}</p>
+  );
 
   if (def.tipo === "lista") {
     const linhas = Array.isArray(valor) ? valor : [];
@@ -219,17 +314,42 @@ function Campo(props: {
     return (
       <div className="space-y-2 sm:col-span-2">
         {cabecalho}
-        {linhas.length === 0 && <p className="text-sm text-muted-foreground">Nenhum item cadastrado.</p>}
+        {linhas.length === 0 && (
+          <p className="text-sm text-muted-foreground">Nenhum item cadastrado.</p>
+        )}
         {linhas.map((l, i) => (
           <div key={i} className="flex flex-wrap gap-2">
             {campos.map((c) => (
-              <Input key={c.chave} className="min-w-40 flex-1" placeholder={c.rotulo} aria-label={c.rotulo} value={l[c.chave] ?? ""} disabled={desabilitado}
-                onChange={(e) => onChange(linhas.map((x, j) => (j === i ? { ...x, [c.chave]: e.target.value } : x)))} />
+              <Input
+                key={c.chave}
+                className="min-w-40 flex-1"
+                placeholder={c.rotulo}
+                aria-label={c.rotulo}
+                value={l[c.chave] ?? ""}
+                disabled={desabilitado}
+                onChange={(e) =>
+                  onChange(
+                    linhas.map((x, j) => (j === i ? { ...x, [c.chave]: e.target.value } : x)),
+                  )
+                }
+              />
             ))}
-            {!desabilitado && <Button variant="ghost" size="sm" onClick={() => onChange(linhas.filter((_, j) => j !== i))}>Remover</Button>}
+            {!desabilitado && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onChange(linhas.filter((_, j) => j !== i))}
+              >
+                Remover
+              </Button>
+            )}
           </div>
         ))}
-        {!desabilitado && <Button variant="outline" size="sm" onClick={() => onChange([...linhas, vazia()])}>Adicionar</Button>}
+        {!desabilitado && (
+          <Button variant="outline" size="sm" onClick={() => onChange([...linhas, vazia()])}>
+            Adicionar
+          </Button>
+        )}
         {rodape}
       </div>
     );
@@ -243,9 +363,13 @@ function Campo(props: {
           id={def.chave}
           value={typeof valor === "string" ? valor : ""}
           disabled={desabilitado}
-          inputMode={["moeda", "percentual", "inteiro", "decimal"].includes(def.tipo) ? "decimal" : undefined}
+          inputMode={
+            ["moeda", "percentual", "inteiro", "decimal"].includes(def.tipo) ? "decimal" : undefined
+          }
           type={def.tipo === "email" ? "email" : "text"}
-          placeholder={def.tipo === "horario" ? "HH:MM" : def.preencher ? "Não preenchido" : undefined}
+          placeholder={
+            def.tipo === "horario" ? "HH:MM" : def.preencher ? "Não preenchido" : undefined
+          }
           onChange={(e) => onChange(e.target.value)}
         />
         {sufixo && <span className="text-sm text-muted-foreground">{sufixo}</span>}

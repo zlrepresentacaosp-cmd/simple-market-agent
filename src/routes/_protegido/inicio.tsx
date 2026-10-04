@@ -21,8 +21,8 @@ function Inicio() {
     <div className="space-y-2">
       <h1 className="text-2xl font-semibold">Olá, {usuario.nome}</h1>
       <p className="text-muted-foreground">
-        Você está conectado como {rotuloPapel(usuario.papel)}. Fase 1 (Base): Configurações e usuários disponíveis.
-        Os demais módulos chegam nas próximas fases.
+        Você está conectado como {rotuloPapel(usuario.papel)}. Fase 1 (Base): Configurações e
+        usuários disponíveis. Os demais módulos chegam nas próximas fases.
       </p>
     </div>
   );

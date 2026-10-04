@@ -27,7 +27,12 @@ export function listarConfiguracoes(db: DB): Configuracao[] {
       `SELECT s.chave, s.valor, s.updated_at, u.nome AS updated_by
        FROM settings s LEFT JOIN users u ON u.id = s.updated_by`,
     )
-    .all() as { chave: string; valor: string | null; updated_at: string; updated_by: string | null }[];
+    .all() as {
+    chave: string;
+    valor: string | null;
+    updated_at: string;
+    updated_by: string | null;
+  }[];
   const ordem = new Map(PARAMETROS.map((p, i) => [p.chave, i]));
   return rows
     .filter((r) => ordem.has(r.chave))
@@ -59,7 +64,10 @@ export function atualizarConfiguracoes(
   const validados: Record<string, unknown> = {};
   for (const [chave, raw] of Object.entries(alteracoes)) {
     const def = getParamDef(chave);
-    if (!def) { erros.push(`Parâmetro desconhecido: ${chave}.`); continue; }
+    if (!def) {
+      erros.push(`Parâmetro desconhecido: ${chave}.`);
+      continue;
+    }
     const r = validarParametro(def, raw);
     if (!r.ok) erros.push(r.error);
     else validados[chave] = r.value;
@@ -84,7 +92,14 @@ export function atualizarConfiguracoes(
       alteradas.push(chave);
     }
     if (alteradas.length) {
-      registrarAuditoria(db, userId, origem === "importacao" ? "importar" : "alterar", "configuracoes", null, { chaves: alteradas });
+      registrarAuditoria(
+        db,
+        userId,
+        origem === "importacao" ? "importar" : "alterar",
+        "configuracoes",
+        null,
+        { chaves: alteradas },
+      );
     }
   })();
   return alteradas;
@@ -106,8 +121,13 @@ export function listarHistorico(db: DB, chave?: string, limite = 500): EntradaHi
      ${chave ? "WHERE h.chave = ?" : ""} ORDER BY h.id DESC LIMIT ?`;
   const params: unknown[] = chave ? [chave, limite] : [limite];
   const rows = db.prepare(sql).all(...params) as {
-    id: number; chave: string; valor_anterior: string | null; valor_novo: string | null;
-    usuario: string | null; origem: string; changed_at: string;
+    id: number;
+    chave: string;
+    valor_anterior: string | null;
+    valor_novo: string | null;
+    usuario: string | null;
+    origem: string;
+    changed_at: string;
   }[];
   return rows.map((r) => ({
     ...r,
@@ -131,8 +151,10 @@ export function exportarConfiguracoes(db: DB) {
 export function importarConfiguracoes(db: DB, userId: number, json: unknown): string[] {
   if (typeof json !== "object" || json === null) throw new ErroValidacao(["Arquivo inválido."]);
   const o = json as Record<string, unknown>;
-  if (o["formato"] !== FORMATO_EXPORTACAO) throw new ErroValidacao(["Formato de arquivo não reconhecido."]);
+  if (o["formato"] !== FORMATO_EXPORTACAO)
+    throw new ErroValidacao(["Formato de arquivo não reconhecido."]);
   const p = o["parametros"];
-  if (typeof p !== "object" || p === null || Array.isArray(p)) throw new ErroValidacao(["Parâmetros ausentes."]);
+  if (typeof p !== "object" || p === null || Array.isArray(p))
+    throw new ErroValidacao(["Parâmetros ausentes."]);
   return atualizarConfiguracoes(db, userId, p as Record<string, unknown>, "importacao");
 }

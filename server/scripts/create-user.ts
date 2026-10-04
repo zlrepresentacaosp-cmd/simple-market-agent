@@ -15,9 +15,15 @@ async function perguntarSenha(): Promise<string> {
   const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
   const out = rl as unknown as { _writeToOutput: (s: string) => void; output: NodeJS.WriteStream };
   let mascarar = false;
-  out._writeToOutput = (s: string) => { out.output.write(mascarar ? "" : s); };
+  out._writeToOutput = (s: string) => {
+    out.output.write(mascarar ? "" : s);
+  };
   return new Promise((res) => {
-    rl.question("Senha: ", (s) => { rl.close(); process.stdout.write("\n"); res(s); });
+    rl.question("Senha: ", (s) => {
+      rl.close();
+      process.stdout.write("\n");
+      res(s);
+    });
     mascarar = true;
   });
 }
@@ -27,7 +33,9 @@ const usuario = arg("usuario");
 const nome = arg("nome") ?? usuario;
 const papel = arg("papel") ?? "gestor";
 if (!usuario || !nome || !isPapel(papel)) {
-  console.error('Uso: npm run user:create -- --usuario <login> --nome "<Nome>" --papel gestor|operacional');
+  console.error(
+    'Uso: npm run user:create -- --usuario <login> --nome "<Nome>" --papel gestor|operacional',
+  );
   process.exit(1);
 }
 const senha = process.env["SENHA"] ?? (await perguntarSenha());

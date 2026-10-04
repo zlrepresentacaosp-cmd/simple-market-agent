@@ -12,5 +12,7 @@ const db = new Database(dbPath);
 db.pragma("foreign_keys = ON");
 const novas = migrate(db);
 semearConfiguracoes(db);
-console.log(novas.length ? `Migrações aplicadas: ${novas.join(", ")}` : "Banco já está atualizado.");
+console.log(
+  novas.length ? `Migrações aplicadas: ${novas.join(", ")}` : "Banco já está atualizado.",
+);
 console.log(`Banco: ${dbPath}`);

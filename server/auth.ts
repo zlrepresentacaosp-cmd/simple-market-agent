@@ -3,7 +3,10 @@ import type { DB } from "./db";
 import { isPapel, type Papel } from "../src/engine/permissions";
 import { registrarAuditoria } from "./audit";
 
-const N = 16384, R = 8, P = 1, KEYLEN = 64;
+const N = 16384,
+  R = 8,
+  P = 1,
+  KEYLEN = 64;
 
 export function hashSenha(senha: string): string {
   const salt = randomBytes(16);
@@ -17,7 +20,9 @@ export function verificarSenha(senha: string, armazenado: string): boolean {
   const [, n, r, p, saltB64, hashB64] = partes as [string, string, string, string, string, string];
   const esperado = Buffer.from(hashB64, "base64");
   const calc = scryptSync(senha, Buffer.from(saltB64, "base64"), esperado.length, {
-    N: Number(n), r: Number(r), p: Number(p),
+    N: Number(n),
+    r: Number(r),
+    p: Number(p),
   });
   return calc.length === esperado.length && timingSafeEqual(calc, esperado);
 }
@@ -31,7 +36,12 @@ export interface Usuario {
 }
 
 interface UserRow {
-  id: number; username: string; nome: string; papel: string; ativo: number; password_hash: string;
+  id: number;
+  username: string;
+  nome: string;
+  papel: string;
+  ativo: number;
+  password_hash: string;
 }
 
 function toUsuario(r: UserRow): Usuario {
@@ -47,8 +57,10 @@ export function criarUsuario(
   autorId: number | null = null,
 ): Usuario {
   const username = dados.username.trim();
-  if (!/^[a-zA-Z0-9._-]{3,40}$/.test(username)) throw new Error("Usuário deve ter 3–40 caracteres (letras, números, . _ -).");
-  if (dados.senha.length < SENHA_MINIMA) throw new Error(`A senha deve ter pelo menos ${SENHA_MINIMA} caracteres.`);
+  if (!/^[a-zA-Z0-9._-]{3,40}$/.test(username))
+    throw new Error("Usuário deve ter 3–40 caracteres (letras, números, . _ -).");
+  if (dados.senha.length < SENHA_MINIMA)
+    throw new Error(`A senha deve ter pelo menos ${SENHA_MINIMA} caracteres.`);
   if (!isPapel(dados.papel)) throw new Error("Papel inválido.");
   if (!dados.nome.trim()) throw new Error("Nome obrigatório.");
   const existe = db.prepare("SELECT 1 FROM users WHERE username = ?").get(username);
@@ -71,7 +83,8 @@ export function listarUsuarios(db: DB): Usuario[] {
 }
 
 export function autenticar(db: DB, username: string, senha: string): Usuario | null {
-  const r = db.prepare("SELECT * FROM users WHERE username = ?").get(username.trim()) as UserRow | undefined;
+  const r = db.prepare("SELECT * FROM users WHERE username = ?").get(username.trim()) as
+    UserRow | undefined;
   if (!r || r.ativo !== 1 || !verificarSenha(senha, r.password_hash)) {
     registrarAuditoria(db, r?.id ?? null, "login_falhou", "sessao", null, { username });
     return null;
@@ -81,10 +94,18 @@ export function autenticar(db: DB, username: string, senha: string): Usuario | n
 
 const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 
-export function criarSessao(db: DB, userId: number, ttlHoras: number): { token: string; expiresAt: string } {
+export function criarSessao(
+  db: DB,
+  userId: number,
+  ttlHoras: number,
+): { token: string; expiresAt: string } {
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + ttlHoras * 3600_000).toISOString();
-  db.prepare("INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)").run(sha256(token), userId, expiresAt);
+  db.prepare("INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)").run(
+    sha256(token),
+    userId,
+    expiresAt,
+  );
   registrarAuditoria(db, userId, "login", "sessao", null, null);
   return { token, expiresAt };
 }

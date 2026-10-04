@@ -81,7 +81,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Compras Inteligentes" },
       { name: "description", content: "Compras Inteligentes — gestão de compras do mercado." },
       { property: "og:title", content: "Compras Inteligentes" },
-      { property: "og:description", content: "Compras Inteligentes — gestão de compras do mercado." },
+      {
+        property: "og:description",
+        content: "Compras Inteligentes — gestão de compras do mercado.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

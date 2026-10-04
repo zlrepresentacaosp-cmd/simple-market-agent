@@ -2,11 +2,21 @@ import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import cookie from "@fastify/cookie";
 import type { DB } from "./db";
 import {
-  autenticar, criarSessao, criarUsuario, encerrarSessao, listarUsuarios, usuarioDaSessao, type Usuario,
+  autenticar,
+  criarSessao,
+  criarUsuario,
+  encerrarSessao,
+  listarUsuarios,
+  usuarioDaSessao,
+  type Usuario,
 } from "./auth";
 import {
-  ErroValidacao, atualizarConfiguracoes, exportarConfiguracoes, importarConfiguracoes,
-  listarConfiguracoes, listarHistorico,
+  ErroValidacao,
+  atualizarConfiguracoes,
+  exportarConfiguracoes,
+  importarConfiguracoes,
+  listarConfiguracoes,
+  listarHistorico,
 } from "./settings";
 import { listarAuditoria } from "./audit";
 import { isPapel, pode, type Permissao } from "../src/engine/permissions";
@@ -39,13 +49,17 @@ export function construirApp(opts: AppOptions) {
 
   const exigir = (perm?: Permissao) => async (req: FastifyRequest, reply: FastifyReply) => {
     if (!req.usuario) return reply.code(401).send({ erro: "Não autenticado." });
-    if (perm && !pode(req.usuario.papel, perm)) return reply.code(403).send({ erro: "Sem permissão." });
+    if (perm && !pode(req.usuario.papel, perm))
+      return reply.code(403).send({ erro: "Sem permissão." });
   };
 
   app.setErrorHandler((err, _req, reply) => {
-    if (err instanceof ErroValidacao) return reply.code(400).send({ erro: err.message, erros: err.erros });
+    if (err instanceof ErroValidacao)
+      return reply.code(400).send({ erro: err.message, erros: err.erros });
     const status = (err as { statusCode?: number }).statusCode ?? 500;
-    return reply.code(status).send({ erro: status === 500 ? "Erro interno." : (err as Error).message });
+    return reply
+      .code(status)
+      .send({ erro: status === 500 ? "Erro interno." : (err as Error).message });
   });
 
   app.get("/api/saude", async () => ({ ok: true }));
@@ -60,7 +74,10 @@ export function construirApp(opts: AppOptions) {
     if (!u) return reply.code(401).send({ erro: "Usuário ou senha inválidos." });
     const s = criarSessao(db, u.id, sessaoHoras);
     reply.setCookie(COOKIE_SESSAO, s.token, {
-      httpOnly: true, sameSite: "strict", path: "/", secure: opts.cookieSeguro ?? false,
+      httpOnly: true,
+      sameSite: "strict",
+      path: "/",
+      secure: opts.cookieSeguro ?? false,
       expires: new Date(s.expiresAt),
     });
     return { usuario: u };
@@ -79,37 +96,69 @@ export function construirApp(opts: AppOptions) {
     configuracoes: listarConfiguracoes(db),
   }));
 
-  app.put("/api/configuracoes", { preHandler: exigir("configuracoes.editar") }, async (req, reply) => {
-    const b = req.body as { alteracoes?: unknown } | undefined;
-    if (!b || typeof b.alteracoes !== "object" || b.alteracoes === null || Array.isArray(b.alteracoes)) {
-      return reply.code(400).send({ erro: "Corpo inválido." });
-    }
-    const alteradas = atualizarConfiguracoes(db, req.usuario!.id, b.alteracoes as Record<string, unknown>);
-    return { alteradas, configuracoes: listarConfiguracoes(db) };
-  });
+  app.put(
+    "/api/configuracoes",
+    { preHandler: exigir("configuracoes.editar") },
+    async (req, reply) => {
+      const b = req.body as { alteracoes?: unknown } | undefined;
+      if (
+        !b ||
+        typeof b.alteracoes !== "object" ||
+        b.alteracoes === null ||
+        Array.isArray(b.alteracoes)
+      ) {
+        return reply.code(400).send({ erro: "Corpo inválido." });
+      }
+      const alteradas = atualizarConfiguracoes(
+        db,
+        req.usuario!.id,
+        b.alteracoes as Record<string, unknown>,
+      );
+      return { alteradas, configuracoes: listarConfiguracoes(db) };
+    },
+  );
 
-  app.get("/api/configuracoes/historico", { preHandler: exigir("configuracoes.ver") }, async (req) => {
-    const q = req.query as { chave?: string };
-    return { historico: listarHistorico(db, q.chave) };
-  });
+  app.get(
+    "/api/configuracoes/historico",
+    { preHandler: exigir("configuracoes.ver") },
+    async (req) => {
+      const q = req.query as { chave?: string };
+      return { historico: listarHistorico(db, q.chave) };
+    },
+  );
 
-  app.get("/api/configuracoes/exportar", { preHandler: exigir("configuracoes.ver") }, async (_req, reply) => {
-    reply.header("content-disposition", 'attachment; filename="configuracoes.json"');
-    return exportarConfiguracoes(db);
-  });
+  app.get(
+    "/api/configuracoes/exportar",
+    { preHandler: exigir("configuracoes.ver") },
+    async (_req, reply) => {
+      reply.header("content-disposition", 'attachment; filename="configuracoes.json"');
+      return exportarConfiguracoes(db);
+    },
+  );
 
-  app.post("/api/configuracoes/importar", { preHandler: exigir("configuracoes.editar") }, async (req) => {
-    const alteradas = importarConfiguracoes(db, req.usuario!.id, req.body);
-    return { alteradas, configuracoes: listarConfiguracoes(db) };
-  });
+  app.post(
+    "/api/configuracoes/importar",
+    { preHandler: exigir("configuracoes.editar") },
+    async (req) => {
+      const alteradas = importarConfiguracoes(db, req.usuario!.id, req.body);
+      return { alteradas, configuracoes: listarConfiguracoes(db) };
+    },
+  );
 
   // --- Usuários e auditoria (somente Gestor) ---
-  app.get("/api/usuarios", { preHandler: exigir("usuarios.gerenciar") }, async () => ({ usuarios: listarUsuarios(db) }));
+  app.get("/api/usuarios", { preHandler: exigir("usuarios.gerenciar") }, async () => ({
+    usuarios: listarUsuarios(db),
+  }));
 
   app.post("/api/usuarios", { preHandler: exigir("usuarios.gerenciar") }, async (req, reply) => {
     const b = (req.body ?? {}) as Record<string, unknown>;
     const { usuario, nome, senha, papel } = b;
-    if (typeof usuario !== "string" || typeof nome !== "string" || typeof senha !== "string" || !isPapel(papel)) {
+    if (
+      typeof usuario !== "string" ||
+      typeof nome !== "string" ||
+      typeof senha !== "string" ||
+      !isPapel(papel)
+    ) {
       return reply.code(400).send({ erro: "Dados inválidos." });
     }
     try {
@@ -120,7 +169,9 @@ export function construirApp(opts: AppOptions) {
     }
   });
 
-  app.get("/api/auditoria", { preHandler: exigir("auditoria.ver") }, async () => ({ auditoria: listarAuditoria(db) }));
+  app.get("/api/auditoria", { preHandler: exigir("auditoria.ver") }, async () => ({
+    auditoria: listarAuditoria(db),
+  }));
 
   return app;
 }

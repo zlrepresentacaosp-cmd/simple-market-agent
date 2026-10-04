@@ -60,15 +60,14 @@ Cobrem migrações, parâmetros iniciais e [PREENCHER], validação, hash de sen
 
 ## Variáveis (.env)
 
-| Variável | Padrão | Uso |
-| --- | --- | --- |
-| PORT | 3333 | Porta da API |
-| HOST | 127.0.0.1 | Endereço da API |
-| DB_PATH | ./data/compras.db | Arquivo SQLite |
-| SESSION_TTL_HOURS | 12 | Validade da sessão |
-| COOKIE_SECURE | false | `true` se servido via HTTPS |
-| API_URL | http://127.0.0.1:3333 | Destino do encaminhamento /api no `npm run dev` |
-
+| Variável          | Padrão                | Uso                                             |
+| ----------------- | --------------------- | ----------------------------------------------- |
+| PORT              | 3333                  | Porta da API                                    |
+| HOST              | 127.0.0.1             | Endereço da API                                 |
+| DB_PATH           | ./data/compras.db     | Arquivo SQLite                                  |
+| SESSION_TTL_HOURS | 12                    | Validade da sessão                              |
+| COOKIE_SECURE     | false                 | `true` se servido via HTTPS                     |
+| API_URL           | http://127.0.0.1:3333 | Destino do encaminhamento /api no `npm run dev` |
 
 ## CI e desenvolvimento no GitHub
 
