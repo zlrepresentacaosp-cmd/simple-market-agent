@@ -1,0 +1,45 @@
+name: Update npm lockfile
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Branch where package-lock.json will be generated and committed"
+        required: true
+        default: "infra-ci-package-manager"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  update-lockfile:
+    name: Generate and commit package-lock.json
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.target_branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.target_branch == 'infra-ci-package-manager' && '22.x' || '20.x' }}
+
+      - name: Update package lock
+        run: npm install --package-lock-only
+
+      - name: Commit package-lock.json if changed
+        run: |
+          if git diff --quiet -- package-lock.json; then
+            echo "package-lock.json is already up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "chore: refresh npm lockfile"
+          git push origin HEAD:${{ inputs.target_branch }}
