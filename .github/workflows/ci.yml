@@ -37,7 +37,12 @@ jobs:
           node-version: ${{ (inputs.target_branch || github.ref_name) == 'infra-ci-package-manager' && '22.x' || '20.x' }}
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          if [ "${{ inputs.target_branch || github.ref_name }}" = "infra-ci-package-manager" ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Apply SQLite migrations
         run: npm run db:migrate
