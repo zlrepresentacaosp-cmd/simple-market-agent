@@ -21,7 +21,7 @@ export async function api<T>(caminho: string, init?: RequestInit & { json?: unkn
     res = await fetch(caminho, {
       credentials: "same-origin",
       ...rest,
-      headers: json !== undefined ? { "content-type": "application/json", ...rest.headers } : rest.headers,
+      headers: json !== undefined ? { "content-type": "application/json" } : (rest.headers ?? {}),
       body: json !== undefined ? JSON.stringify(json) : (rest.body ?? null),
     });
   } catch {
