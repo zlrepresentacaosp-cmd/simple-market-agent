@@ -18,7 +18,7 @@ src/routes/   Telas (web) — React + Vite + Tailwind
 
 ## Requisitos
 
-- Node.js 20 ou superior e npm. O projeto padroniza em npm para manter o runtime alinhado ao requisito Node 20 e usar instalações determinísticas com `package-lock.json`.
+- Node.js 22.12.0 ou superior e npm. O projeto padroniza em npm para manter o runtime alinhado às dependências e usar instalações determinísticas com `package-lock.json`.
 
 ## Instalação
 
@@ -68,3 +68,10 @@ Cobrem migrações, parâmetros iniciais e [PREENCHER], validação, hash de sen
 | SESSION_TTL_HOURS | 12 | Validade da sessão |
 | COOKIE_SECURE | false | `true` se servido via HTTPS |
 | API_URL | http://127.0.0.1:3333 | Destino do encaminhamento /api no `npm run dev` |
+
+
+## CI e desenvolvimento no GitHub
+
+O CI usa Node.js 22 e executa instalação com `npm ci`, migrações SQLite, ESLint, `tsc --noEmit`, Vitest e build. O workflow `Update npm lockfile` é manual e atualiza apenas o `package-lock.json` na branch `infra-ci-package-manager`.
+
+Para o desenvolvimento local, use Node 22 (o arquivo `.nvmrc` fixa a linha 22).
