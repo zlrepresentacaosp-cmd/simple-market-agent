@@ -18,12 +18,12 @@ src/routes/   Telas (web) — React + Vite + Tailwind
 
 ## Requisitos
 
-- Node.js 20 ou superior e npm.
+- Node.js 20 ou superior e npm. O projeto padroniza em npm para manter o runtime alinhado ao requisito Node 20 e usar instalações determinísticas com `package-lock.json`.
 
 ## Instalação
 
 ```sh
-npm install
+npm ci
 cp .env.example .env      # ajuste se necessário
 npm run db:migrate        # cria ./data/compras.db e os parâmetros iniciais
 ```
