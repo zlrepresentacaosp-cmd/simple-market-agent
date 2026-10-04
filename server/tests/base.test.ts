@@ -64,9 +64,8 @@ describe("parâmetros iniciais", () => {
   });
 
   it("semear de novo não sobrescreve", () => {
-    const u = criarUsuario(db, { username: "g", nome: "G", senha: "senhaforte1", papel: "gestor" });
+    const u = criarUsuario(db, { username: "gestora", nome: "G", senha: "senhaforte1", papel: "gestor" });
     atualizarConfiguracoes(db, u.id, { margem_bruta_alvo: 30 });
-    abrirBanco; // reabrir não se aplica a :memory:, então chamamos a semente diretamente
     expect(valoresAtuais(db)["margem_bruta_alvo"]).toBe(30);
   });
 });
@@ -104,7 +103,7 @@ describe("senhas e autenticação", () => {
     expect(hashSenha("minhasenha123")).not.toBe(h);
   });
   it("rejeita senha curta e usuário duplicado", () => {
-    expect(() => criarUsuario(db, { username: "a1", nome: "A", senha: "123", papel: "gestor" })).toThrow();
+    expect(() => criarUsuario(db, { username: "a12", nome: "A", senha: "123", papel: "gestor" })).toThrow();
     criarUsuario(db, { username: "abc", nome: "A", senha: "senhaforte1", papel: "gestor" });
     expect(() => criarUsuario(db, { username: "ABC", nome: "A", senha: "senhaforte1", papel: "gestor" })).toThrow();
   });
@@ -117,7 +116,7 @@ describe("senhas e autenticação", () => {
 
 describe("histórico e auditoria", () => {
   it("registra antes/depois/quem/quando", () => {
-    const u = criarUsuario(db, { username: "g", nome: "Gestora", senha: "senhaforte1", papel: "gestor" });
+    const u = criarUsuario(db, { username: "gestora", nome: "Gestora", senha: "senhaforte1", papel: "gestor" });
     const alt = atualizarConfiguracoes(db, u.id, { margem_bruta_alvo: "32,5", giro_minimo: 3 });
     expect(alt).toEqual(["margem_bruta_alvo"]);
     const h = listarHistorico(db);
@@ -128,13 +127,13 @@ describe("histórico e auditoria", () => {
     expect(audit).toHaveLength(1);
   });
   it("não grava nada se algum valor for inválido", () => {
-    const u = criarUsuario(db, { username: "g", nome: "G", senha: "senhaforte1", papel: "gestor" });
+    const u = criarUsuario(db, { username: "gestora", nome: "G", senha: "senhaforte1", papel: "gestor" });
     expect(() => atualizarConfiguracoes(db, u.id, { margem_bruta_alvo: 30, cobertura_dias_a: -1 })).toThrow(ErroValidacao);
     expect(valoresAtuais(db)["margem_bruta_alvo"]).toBe(35);
     expect(listarHistorico(db)).toHaveLength(0);
   });
   it("exporta e importa JSON", () => {
-    const u = criarUsuario(db, { username: "g", nome: "G", senha: "senhaforte1", papel: "gestor" });
+    const u = criarUsuario(db, { username: "gestora", nome: "G", senha: "senhaforte1", papel: "gestor" });
     const exp = exportarConfiguracoes(db);
     (exp.parametros as Record<string, unknown>)["cobertura_dias_c"] = 28;
     const alt = importarConfiguracoes(db, u.id, JSON.parse(JSON.stringify(exp)));
@@ -153,7 +152,7 @@ describe("API e RBAC", () => {
 
   it("fluxo completo Gestor x Operacional", async () => {
     criarUsuario(db, { username: "gestor", nome: "Gestor", senha: "senhaforte1", papel: "gestor" });
-    criarUsuario(db, { username: "op", nome: "Op", senha: "senhaforte2", papel: "operacional" });
+    criarUsuario(db, { username: "oper", nome: "Op", senha: "senhaforte2", papel: "operacional" });
     const app = construirApp({ db });
 
     expect((await app.inject({ url: "/api/configuracoes" })).statusCode).toBe(401);
@@ -171,7 +170,7 @@ describe("API e RBAC", () => {
     const bad = await app.inject({ method: "PUT", url: "/api/configuracoes", cookies: g.cookie, payload: { alteracoes: { margem_bruta_alvo: "abc" } } });
     expect(bad.statusCode).toBe(400);
 
-    const o = await login(app, "op", "senhaforte2");
+    const o = await login(app, "oper", "senhaforte2");
     expect((await app.inject({ url: "/api/configuracoes", cookies: o.cookie })).statusCode).toBe(200);
     expect((await app.inject({ url: "/api/configuracoes/historico", cookies: o.cookie })).json().historico).toHaveLength(1);
     expect((await app.inject({ method: "PUT", url: "/api/configuracoes", cookies: o.cookie, payload: { alteracoes: { aluguel: 1 } } })).statusCode).toBe(403);
