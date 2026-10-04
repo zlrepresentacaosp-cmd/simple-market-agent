@@ -22,7 +22,7 @@ export async function api<T>(caminho: string, init?: RequestInit & { json?: unkn
       credentials: "same-origin",
       ...rest,
       headers: json !== undefined ? { "content-type": "application/json", ...rest.headers } : rest.headers,
-      body: json !== undefined ? JSON.stringify(json) : rest.body,
+      body: json !== undefined ? JSON.stringify(json) : (rest.body ?? null),
     });
   } catch {
     throw new ErroAPI(0, "Servidor local indisponível. Inicie com: npm run dev:server");

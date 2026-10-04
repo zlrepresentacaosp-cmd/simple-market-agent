@@ -45,7 +45,7 @@ export function construirApp(opts: AppOptions) {
   app.setErrorHandler((err, _req, reply) => {
     if (err instanceof ErroValidacao) return reply.code(400).send({ erro: err.message, erros: err.erros });
     const status = (err as { statusCode?: number }).statusCode ?? 500;
-    return reply.code(status).send({ erro: status === 500 ? "Erro interno." : err.message });
+    return reply.code(status).send({ erro: status === 500 ? "Erro interno." : (err as Error).message });
   });
 
   app.get("/api/saude", async () => ({ ok: true }));
