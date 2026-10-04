@@ -18,6 +18,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Reject main as target branch
+        if: inputs.target_branch == 'main'
+        run: |
+          echo "Refusing to write package-lock.json to main. Choose a development branch."
+          exit 1
+
       - name: Checkout selected branch
         uses: actions/checkout@v6
         with:
